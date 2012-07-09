@@ -1,11 +1,8 @@
-/*!
- * Bootstrap Responsive v2.0.4
- *
- * Copyright 2012 Twitter, Inc
- * Licensed under the Apache License v2.0
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Designed and built with all the love in the world @twitter by @mdo and @fat.
+// Mixins.less
+// Snippets of reusable CSS to develop faster and keep code readable
+// -----------------------------------------------------------------
+
+
 
 
 // CSS3 PROPERTIES
@@ -76,10 +73,10 @@
 // Default value is `visible`, but can be changed to `hidden
 // See git pull https://github.com/dannykeane/bootstrap.git backface-visibility for examples
 .backface-visibility(@visibility){
-	-webkit-backface-visibility: @visibility;
-	   -moz-backface-visibility: @visibility;
-	    -ms-backface-visibility: @visibility;
-	        backface-visibility: @visibility;
+  -webkit-backface-visibility: @visibility;
+     -moz-backface-visibility: @visibility;
+      -ms-backface-visibility: @visibility;
+          backface-visibility: @visibility;
 }
 
 // Background clipping
@@ -234,4 +231,229 @@
     background-image: -o-linear-gradient(@angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
     background-image: linear-gradient(@angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
   }
+}
+// Reset filters for IE
+.reset-filter() {
+  filter: e(%("progid:DXImageTransform.Microsoft.gradient(enabled = false)"));
+}
+
+
+
+// COMPONENT MIXINS
+// --------------------------------------------------
+
+// Horizontal dividers
+// -------------------------
+// Dividers (basically an hr) within dropdowns and nav lists
+.nav-divider(@top: #e5e5e5, @bottom: @white) {
+  // IE7 needs a set width since we gave a height. Restricting just
+  // to IE7 to keep the 1px left/right space in other browsers.
+  // It is unclear where IE is getting the extra space that we need
+  // to negative-margin away, but so it goes.
+  *width: 100%;
+  height: 1px;
+  margin: ((@baseLineHeight / 2) - 1) 1px; // 8px 1px
+  *margin: -5px 0 5px;
+  overflow: hidden;
+  background-color: @top;
+  border-bottom: 1px solid @bottom;
+}
+
+// Button backgrounds
+// ------------------
+.buttonBackground(@startColor, @endColor) {
+  // gradientBar will set the background to a pleasing blend of these, to support IE<=9
+  .gradientBar(@startColor, @endColor);
+  *background-color: @endColor; /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  .reset-filter();
+
+  // in these cases the gradient won't cover the background, so we override
+  &:hover, &:active, &.active, &.disabled, &[disabled] {
+    background-color: @endColor;
+    *background-color: darken(@endColor, 5%);
+  }
+
+  // IE 7 + 8 can't handle box-shadow to show active, so we darken a bit ourselves
+  &:active,
+  &.active {
+    background-color: darken(@endColor, 10%) e("\9");
+  }
+}
+
+// Navbar vertical align
+// -------------------------
+// Vertically center elements in the navbar.
+// Example: an element has a height of 30px, so write out `.navbarVerticalAlign(30px);` to calculate the appropriate top margin.
+.navbarVerticalAlign(@elementHeight) {
+  margin-top: (@navbarHeight - @elementHeight) / 2;
+}
+
+// Popover arrows
+// -------------------------
+// For tipsies and popovers
+#popoverArrow {
+  .top(@arrowWidth: 5px, @color: @black) {
+    bottom: 0;
+    left: 50%;
+    margin-left: -@arrowWidth;
+    border-left: @arrowWidth solid transparent;
+    border-right: @arrowWidth solid transparent;
+    border-top: @arrowWidth solid @color;
+  }
+  .left(@arrowWidth: 5px, @color: @black) {
+    top: 50%;
+    right: 0;
+    margin-top: -@arrowWidth;
+    border-top: @arrowWidth solid transparent;
+    border-bottom: @arrowWidth solid transparent;
+    border-left: @arrowWidth solid @color;
+  }
+  .bottom(@arrowWidth: 5px, @color: @black) {
+    top: 0;
+    left: 50%;
+    margin-left: -@arrowWidth;
+    border-left: @arrowWidth solid transparent;
+    border-right: @arrowWidth solid transparent;
+    border-bottom: @arrowWidth solid @color;
+  }
+  .right(@arrowWidth: 5px, @color: @black) {
+    top: 50%;
+    left: 0;
+    margin-top: -@arrowWidth;
+    border-top: @arrowWidth solid transparent;
+    border-bottom: @arrowWidth solid transparent;
+    border-right: @arrowWidth solid @color;
+  }
+}
+
+// Grid System
+// -----------
+
+// Centered container element
+.container-fixed() {
+  margin-right: auto;
+  margin-left: auto;
+  .clearfix();
+}
+
+// Table columns
+.tableColumns(@columnSpan: 1) {
+  float: none; // undo default grid column styles
+  width: ((@gridColumnWidth) * @columnSpan) + (@gridGutterWidth * (@columnSpan - 1)) - 16; // 16 is total padding on left and right of table cells
+  margin-left: 0; // undo default grid column styles
+}
+
+// Make a Grid
+// Use .makeRow and .makeColumn to assign semantic layouts grid system behavior
+.makeRow() {
+  margin-left: @gridGutterWidth * -1;
+  .clearfix();
+}
+.makeColumn(@columns: 1, @offset: 0) {
+  float: left;
+  margin-left: (@gridColumnWidth * @offset) + (@gridGutterWidth * (@offset - 1)) + (@gridGutterWidth * 2);
+  width: (@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1));
+}
+
+// The Grid
+#grid {
+
+  .core (@gridColumnWidth, @gridGutterWidth) {
+
+    .spanX (@index) when (@index > 0) {
+      (~".span@{index}") { .span(@index); }
+      .spanX(@index - 1);
+    }
+    .spanX (0) {}
+
+    .offsetX (@index) when (@index > 0) {
+      (~".offset@{index}") { .offset(@index); }
+      .offsetX(@index - 1);
+    }
+    .offsetX (0) {}
+
+    .offset (@columns) {
+      margin-left: (@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns + 1));
+    }
+
+    .span (@columns) {
+      width: (@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1));
+    }
+
+    .row {
+      margin-left: @gridGutterWidth * -1;
+      .clearfix();
+    }
+
+    [class*="span"] {
+      float: left;
+      margin-left: @gridGutterWidth;
+    }
+
+    // Set the container width, and override it for fixed navbars in media queries
+    .container,
+    .navbar-fixed-top .container,
+    .navbar-fixed-bottom .container { .span(@gridColumns); }
+
+    // generate .spanX and .offsetX
+    .spanX (@gridColumns);
+    .offsetX (@gridColumns);
+
+  }
+
+  .fluid (@fluidGridColumnWidth, @fluidGridGutterWidth) {
+
+    .spanX (@index) when (@index > 0) {
+      (~".span@{index}") { .span(@index); }
+      .spanX(@index - 1);
+    }
+    .spanX (0) {}
+
+    .span (@columns) {
+      width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1));
+      *width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) - (.5 / @gridRowWidth * 100 * 1%);
+    }
+
+    .row-fluid {
+      width: 100%;
+      .clearfix();
+      [class*="span"] {
+        .input-block-level();
+        float: left;
+        margin-left: @fluidGridGutterWidth;
+        *margin-left: @fluidGridGutterWidth - (.5 / @gridRowWidth * 100 * 1%);
+      }
+      [class*="span"]:first-child {
+        margin-left: 0;
+      }
+
+      // generate .spanX
+      .spanX (@gridColumns);
+    }
+
+  }
+
+  .input(@gridColumnWidth, @gridGutterWidth) {
+
+    .spanX (@index) when (@index > 0) {
+      (~"input.span@{index}, textarea.span@{index}, .uneditable-input.span@{index}") { .span(@index); }
+      .spanX(@index - 1);
+    }
+    .spanX (0) {}
+
+    .span(@columns) {
+      width: ((@gridColumnWidth) * @columns) + (@gridGutterWidth * (@columns - 1)) - 10;
+    }
+
+    input,
+    textarea,
+    .uneditable-input {
+      margin-left: 0; // override margin-left from core grid system
+    }
+
+    // generate .spanX
+    .spanX (@gridColumns);
+
+  }
+
 }
