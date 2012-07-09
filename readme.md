@@ -1,20 +1,19 @@
 # web-template
-default project setup for webprojects. i made this for me, probably you dont like it.
+default project setup for webprojects. i made this for myself and use it as a boilerplate to quickly bootstrap a webproject.
 
-## files shamelessly stolen from twitter-bootstrap v.2.0.4
+### files shamelessly stolen from twitter-bootstrap
 * css/bootstrap.min.css
 * css/bootstrap-responsive.min.css
 * img/glyphicons-halflings-white.png
 * img/glyphicons-halflings.png
 * js/bootstrap.min.js
 
-## as well as parts for
+### as well as parts for
 * less/bs-mixins.less (why? because they rock)
 
-### Bootstrap-Licence
-all "stolen" files above are licensed under the Apache License, Version 2.0 and copyrighted by Twitter, Inc.
-please see https://github.com/twitter/bootstrap/
-
+### vendor-lib versions:
+* twitter-bootsstrap: 2.0.4
+* jquery: 1.7.2
 
 ## Licence
 The MIT License (MIT)
